@@ -98,7 +98,7 @@ if __name__ == '__main__':
     rho_layers = np.array([4, 3, 2, 1])
     n = 1e3
     r_M, M, moi = mass(t_layers, rho_layers, n)
-    g = gravity(r_M, M, n)
+    g = gravity(r_M, M)
     r_p, p = pressure(t_layers, rho_layers, n, g, r_M[1:])
     plt.plot(r_M, M)
     plt.show()
