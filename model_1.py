@@ -65,7 +65,7 @@ def mass(t_layers, rho_layers, n):
 
     return r_log, mass_log, moi_log
 
-def gravity(M, r, n):
+def gravity(M, r):
     G = 6.674e-11
     r_g = r.copy()
     r_g.pop(0)
