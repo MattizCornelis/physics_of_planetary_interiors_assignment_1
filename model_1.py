@@ -13,10 +13,18 @@ import matplotlib.pyplot as plt
 def dM(r, rho):
     return 4 * np.pi * rho * r ** 2
 
-def Euler(M_0, r_0, dr, rho, dM):
+def dp(rho, g, dr):
+    return - rho * g * dr
+
+def Euler_M(M_0, r_0, dr, rho, dM):
     r = r_0 + dr
     M = M_0 + dr * dM(r_0, rho)
     return r, M
+
+def Euler_p(p_0, r_0, dr, rho, g, dp):
+    r = r_0 - dr
+    p = p_0 - dr * dp(rho, g, dr)
+    return r, p
 
 def rho(rho_layers, t_layers, r):
     idx = np.where(r <= r_layers(t_layers))[0][0]
@@ -36,7 +44,7 @@ def mass(t_layers, rho_layers, n):
     mass_log = [M_0]
     r_log = []
     for r in np.arange(r_0, R, dr):
-        r, M = Euler(mass_log[-1], r, dr, rho(rho_layers, t_layers, r), dM)
+        r, M = Euler_M(mass_log[-1], r, dr, rho(rho_layers, t_layers, r), dM)
         r_log.append(r)
         mass_log.append(M)
 
@@ -52,16 +60,36 @@ def gravity(M, r, n):
     M_g = M.copy()
     M_g.pop(0)
     M_g = np.array(M_g)
-    print(r[0:3], r_g[0:2], M[0:3], M_g[0:2])
     return G * M_g / (r_g)**2
+
+def pressure(t_layers, rho_layers, n, g_lst, r_lst):
+    R = np.sum(t_layers)
+    r_0 = R
+    p_0 = 0
+    dr = R / n
+    pressure_log = [p_0]
+    r_log = []
+    for r in np.arange(r_0, 0, -dr):
+        idx_g = np.where(r <= r_lst)[0][0]
+        g = g_lst[idx_g]
+        r, p = Euler_p(pressure_log[-1], r, dr, rho(rho_layers, t_layers, r), g, dp)
+        r_log.append(r)
+        pressure_log.append(p)
+    pressure_log.pop(0)
+
+    return r_log, pressure_log
 
 if __name__ == '__main__':
     t_layers = np.array([1, 1, 1])
     rho_layers = np.array([3, 2, 1])
     n = 1e3
-    r, M = mass(t_layers, rho_layers, n)
-    g = gravity(r, M, n)
-    plt.plot(r, M)
+    r_M, M = mass(t_layers, rho_layers, n)
+    g = gravity(r_M, M, n)
+    r_p, p = pressure(t_layers, rho_layers, n, g, r_M[1:])
+    r_p = r_p[-1::-1]
+    plt.plot(r_M, M)
     plt.show()
-    plt.plot(r[1:], g)
+    plt.plot(r_M[1:], g)
+    plt.show()
+    plt.plot(r_p, p)
     plt.show()
