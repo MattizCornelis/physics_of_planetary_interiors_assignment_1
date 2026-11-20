@@ -68,28 +68,30 @@ def pressure(t_layers, rho_layers, n, g_lst, r_lst):
     p_0 = 0
     dr = R / n
     pressure_log = [p_0]
-    r_log = []
+    r_log = [r_0]
     for r in np.arange(r_0, 0, -dr):
         idx_g = np.where(r <= r_lst)[0][0]
         g = g_lst[idx_g]
         r, p = Euler_p(pressure_log[-1], r, dr, rho(rho_layers, t_layers, r), g, dp)
         r_log.append(r)
         pressure_log.append(p)
-    pressure_log.pop(0)
+    pressure_log.pop(-1)
+    r_log.pop(-1)
 
     return r_log, pressure_log
 
 if __name__ == '__main__':
-    t_layers = np.array([1, 1, 1])
-    rho_layers = np.array([3, 2, 1])
+    t_layers = np.array([1, 1, 1, 1])
+    rho_layers = np.array([4, 3, 2, 1])
     n = 1e3
     r_M, M = mass(t_layers, rho_layers, n)
     g = gravity(r_M, M, n)
     r_p, p = pressure(t_layers, rho_layers, n, g, r_M[1:])
-    r_p = r_p[-1::-1]
     plt.plot(r_M, M)
     plt.show()
     plt.plot(r_M[1:], g)
+    plt.loglog()
     plt.show()
     plt.plot(r_p, p)
+    plt.loglog()
     plt.show()
