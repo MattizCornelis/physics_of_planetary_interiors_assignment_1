@@ -94,19 +94,27 @@ def pressure(t_layers, rho_layers, n, g_lst, r_lst):
     return r_log, pressure_log
 
 if __name__ == '__main__':
-    t_layers = np.array([1, 1, 1, 1])
-    rho_layers = np.array([4, 3, 2, 1])
+    t_layers = np.array([1, 1, 1, 1]) # [m]
+    rho_layers = np.array([4, 3, 2, 1]) # [kg/m^3]
     n = 1e3
     r_M, M, moi = mass(t_layers, rho_layers, n)
     g = gravity(r_M, M)
     r_p, p = pressure(t_layers, rho_layers, n, g, r_M[1:])
     plt.plot(r_M, M)
+    plt.xlabel('Radius [m]')
+    plt.ylabel('Mass [kg]')
     plt.show()
     plt.plot(r_M, moi)
+    plt.xlabel('Radius [m]')
+    plt.ylabel(r'Moment of Inertia [kg $m^2$]')
     plt.show()
     plt.plot(r_M[1:], g)
+    plt.xlabel('Radius [m]')
+    plt.ylabel(r'Surface Gravity [$\frac{m}{s^2}$]')
     plt.loglog()
     plt.show()
     plt.plot(r_p, p)
+    plt.xlabel('Radius [m]')
+    plt.ylabel('Pressure [Pa]')
     plt.loglog()
     plt.show()
