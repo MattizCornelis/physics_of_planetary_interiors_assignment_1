@@ -106,26 +106,35 @@ if __name__ == '__main__':
     g = gravity(M, r_M)
     r_p, p = pressure(t_layers, rho_layers, n, g, r_M)
 
+    for i in range(len(r_M)):
+        r_M[i] = r_M[i] * 1e-3
+
+    for i in range(len(r_p)):
+        r_p[i] = r_p[i] * 1e-3
+        p[i] = p[i] * 1e-9
+
     print("--- Model Output Values ---")
     print(f"Total Mass: {M[-1]:.4e} kg")
-    print(f"Total Mass Moment of Inertia: {moi[-1]:.4e} kg m^2")
+    print(f"Total Mass Moment of Inertia: {moi[-1]:.4}")
+    print(f"Total Radius: {r_M[-1]} km")
+    print(f"Total Surface Gravity: {g[-1]:.4} m/s^2")
 
     plt.plot(r_M, M)
-    plt.xlabel('Radius [m]')
+    plt.xlabel('Radius [km]')
     plt.ylabel('Mass [kg]')
     plt.show()
 
     plt.plot(r_M, moi)
-    plt.xlabel('Radius [m]')
-    plt.ylabel(r'Moment of Inertia [kg $m^2$]')
+    plt.xlabel('Radius [km]')
+    plt.ylabel('Moment of Inertia [-]')
     plt.show()
 
     plt.plot(r_M, g)
-    plt.xlabel('Radius [m]')
+    plt.xlabel('Radius [km]')
     plt.ylabel(r'Surface Gravity [$\frac{m}{s^2}$]')
     plt.show()
 
     plt.plot(r_p, p)
-    plt.xlabel('Radius [m]')
-    plt.ylabel('Pressure [Pa]')
+    plt.xlabel('Radius [km]')
+    plt.ylabel('Pressure [GPa]')
     plt.show()
