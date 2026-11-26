@@ -67,7 +67,7 @@ def mass(t_layers, rho_layers, n):
 
     for i in range(len(moi_log)):
         if r_log[i] != 0.0 and mass_log[i] != 0.0:
-            moi_log[i] /= mass_log[i] * r_log[i]
+            moi_log[i] /= mass_log[i] * r_log[i]**2
 
     return r_log, mass_log, moi_log
 
