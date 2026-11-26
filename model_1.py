@@ -35,89 +35,97 @@ def Euler_moi(moi_0, r_0, dr, rho, dmoi):
     return r, moi
 
 def rho(rho_layers, t_layers, r):
-    idx = np.where(r <= r_layers(t_layers))[0][0]
+    r_layers = np.cumsum(t_layers)
+    if r >= r_layers[-1]:
+        return rho_layers[-1]
+    idx = np.where(r < r_layers)[0][0]
     return rho_layers[idx]
 
-def r_layers(t_layers):
-    r_layers = np.zeros_like(t_layers)
-    for i in range(t_layers.shape[0]):
-        r_layers[i] = t_layers[i] + r_layers[i-1]
-    return r_layers
-
 def mass(t_layers, rho_layers, n):
-    r_0 = 0
-    M_0 = 0
-    moi_0 = 0
     R = np.sum(t_layers)
     dr = R / n
-    mass_log = [M_0]
-    moi_log = [moi_0]
-    r_log = []
-    for r in np.arange(r_0, R, dr):
-        r, M = Euler_M(mass_log[-1], r, dr, rho(rho_layers, t_layers, r), dM)
-        _, moi = Euler_moi(moi_log[-1], r, dr, rho(rho_layers, t_layers, r), dmoi)
-        r_log.append(r)
-        mass_log.append(M)
-        moi_log.append(moi)
 
-    mass_log.pop(0)
-    moi_log.pop(0)
+    M_curr = 0
+    moi_curr = 0
+
+    mass_log = []
+    moi_log = []
+    r_log = []
+
+    for r_curr in np.arange(0, R, dr):
+        current_rho = rho(rho_layers, t_layers, r_curr)
+
+        r_next, M_next = Euler_M(M_curr, r_curr, dr, current_rho, dM)
+        _, moi_next = Euler_moi(moi_curr, r_curr, dr, current_rho, dmoi)
+
+        r_log.append(r_next)
+        mass_log.append(M_next)
+        moi_log.append(moi_next)
+
+        M_curr = M_next
+        moi_curr = moi_next
+
+    for i in range(len(moi_log)):
+        if r_log[i] != 0.0 and mass_log[i] != 0.0:
+            moi_log[i] /= mass_log[i] * r_log[i]
 
     return r_log, mass_log, moi_log
 
 def gravity(M, r):
     G = 6.674e-11
-    r_g = r.copy()
-    r_g.pop(0)
-    r_g = np.array(r_g)
-    M_g = M.copy()
-    M_g.pop(0)
-    M_g = np.array(M_g)
-    return G * M_g / (r_g)**2
+    return G * np.array(M) / (np.array(r)**2)
 
 def pressure(t_layers, rho_layers, n, g_lst, r_lst):
     R = np.sum(t_layers)
-    r_0 = R
-    p_0 = 0
     dr = R / n
-    pressure_log = [p_0]
-    r_log = [r_0]
-    for r in np.arange(r_0, 0, -dr):
-        idx_g = np.where(r <= r_lst)[0][0]
+    p_current = 0
+
+    pressure_log = [p_current]
+    r_log = [R]
+
+    for r_curr in np.arange(R, 0, -dr):
+        current_rho = rho(rho_layers, t_layers, r_curr)
+
+        idx_g = np.argmin(np.abs(np.array(r_lst) - r_curr))
         g = g_lst[idx_g]
-        r, p = Euler_p(pressure_log[-1], r, dr, rho(rho_layers, t_layers, r), g, dp)
-        r_log.append(r)
-        pressure_log.append(p)
-    pressure_log.pop(-1)
-    r_log.pop(-1)
+
+        r_next, p_next = Euler_p(p_current, r_curr, dr, current_rho, g, dp)
+
+        r_log.append(r_next)
+        pressure_log.append(p_next)
+        p_current = p_next
 
     return r_log, pressure_log
 
 if __name__ == '__main__':
-    t_layers = np.array([1, 1, 1, 1]) # [m]
-    rho_layers = np.array([4, 3, 2, 1]) # [kg/m^3]
-    n = 1e3
+    t_layers = np.array([3228e3, 2091e3, 703e3, 30e3]) # [m]
+    rho_layers = np.array([10401, 4898, 3691, 2900]) # [kg/m^3]
+    n = 1000
+
     r_M, M, moi = mass(t_layers, rho_layers, n)
-    g = gravity(r_M, M)
-    r_p, p = pressure(t_layers, rho_layers, n, g, r_M[1:])
+    g = gravity(M, r_M)
+    r_p, p = pressure(t_layers, rho_layers, n, g, r_M)
+
     print("--- Model Output Values ---")
-    print(f"Total Mass: {M[-1]} kg")
-    print(f"Total Mass Moment of Inertia: {moi[-1]} kgm^2")
+    print(f"Total Mass: {M[-1]:.4e} kg")
+    print(f"Total Mass Moment of Inertia: {moi[-1]:.4e} kg m^2")
+
     plt.plot(r_M, M)
     plt.xlabel('Radius [m]')
     plt.ylabel('Mass [kg]')
     plt.show()
+
     plt.plot(r_M, moi)
     plt.xlabel('Radius [m]')
     plt.ylabel(r'Moment of Inertia [kg $m^2$]')
     plt.show()
-    plt.plot(r_M[1:], g)
+
+    plt.plot(r_M, g)
     plt.xlabel('Radius [m]')
     plt.ylabel(r'Surface Gravity [$\frac{m}{s^2}$]')
-    plt.loglog()
     plt.show()
+
     plt.plot(r_p, p)
     plt.xlabel('Radius [m]')
     plt.ylabel('Pressure [Pa]')
-    plt.loglog()
     plt.show()
