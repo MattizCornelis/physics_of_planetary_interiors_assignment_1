@@ -97,6 +97,19 @@ def pressure(t_layers, rho_layers, n, g_lst, r_lst):
 
     return r_log, pressure_log
 
+def opt_obj(x_0_scaled, x_norm, n, R_ref, m_ref, moi_ref):
+    x_0 = x_0_scaled * x_norm
+    t_layers = x_0[:4]
+    rho_layers = x_0[4:]
+    r_M, m, moi = mass(t_layers, rho_layers, n)
+    R_out, m_out, moi_out = r_M[-1], m[-1], moi[-1]
+    m_err = (m_out - m_ref) / m_ref
+    moi_err = (moi_out - moi_ref) / moi_ref
+    R_err = (R_out - R_ref) / R_ref
+    return m_err**2 + moi_err**2 + R_err**2
+
+
+
 if __name__ == '__main__':
     t_layers = np.array([3228e3, 2091e3, 703e3, 30e3]) # [m]
     rho_layers = np.array([10401, 4898, 3691, 2900]) # [kg/m^3]
