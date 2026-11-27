@@ -13,7 +13,7 @@ def opt_1(m_ref, moi_ref, R_ref, t_layers, rho_layers, n):
     x_bounds = sp.optimize.Bounds(x_l, x_u)
     def obj(x_0_scaled):
         return m1.opt_obj(x_0_scaled, x_norms, n, R_ref, m_ref, moi_ref)
-    sol = sp.optimize.minimize(obj, x_0_scaled, method='trust-constr', bounds=x_bounds, options={'gtol': 1e-16})
+    sol = sp.optimize.minimize(obj, x_0_scaled, method='trust-constr', bounds=x_bounds)
 
     return sol.x * x_norms
 
