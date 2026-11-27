@@ -45,3 +45,5 @@ if __name__ == "__main__":
             f"MoI: {(moi[-1]-mois_ref[i])/mois_ref[i]:.2e}, "
             f"R: {(r_M[-1]-R_ref)/R_ref:.2e}\n"
         )
+        np.save(f"t_layers_{labels[i]}", t_opt)
+        np.save(f"rho_layers_{labels[i]}", rho_opt)
