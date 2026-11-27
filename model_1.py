@@ -108,13 +108,7 @@ def opt_obj(x_0_scaled, x_norm, n, R_ref, m_ref, moi_ref):
     R_err = (R_out - R_ref) / R_ref
     return m_err**2 + moi_err**2 + R_err**2
 
-
-
-if __name__ == '__main__':
-    t_layers = np.array([3228e3, 2091e3, 703e3, 30e3]) # [m]
-    rho_layers = np.array([10401, 4898, 3691, 2900]) # [kg/m^3]
-    n = 1000
-
+def print_plot(t_layers, rho_layers, n):
     r_M, M, moi = mass(t_layers, rho_layers, n)
     g = gravity(M, r_M)
     r_p, p = pressure(t_layers, rho_layers, n, g, r_M)
@@ -151,3 +145,10 @@ if __name__ == '__main__':
     plt.xlabel('Radius [km]')
     plt.ylabel('Pressure [GPa]')
     plt.show()
+
+if __name__ == '__main__':
+    t_layers = np.array([3228e3, 2091e3, 703e3, 30e3]) # [m]
+    rho_layers = np.array([10401, 4898, 3691, 2900]) # [kg/m^3]
+    n = 1000
+
+    print_plot(t_layers, rho_layers, n)
