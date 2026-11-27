@@ -27,10 +27,10 @@ if __name__ == "__main__":
 
     t_init = np.array([3228e3, 2091e3, 703e3, 30e3])       # [m]
     rho_init = np.array([10401.0, 4898.0, 3691.0, 2900.0])  # [kg/m^3]
-    n = 1e3
+    n = 10000
 
     mois_ref = np.array([moi_ref_l, moi_ref_h, moi_ref_m])
-    labels = ["High moi", "Low moi", "Mean moi"]
+    labels = ["Low moi", "High moi", "Mean moi"]
 
     for i in range(mois_ref.size):
         x_opt = opt_1(m_ref, mois_ref[i], R_ref, t_init, rho_init, n)

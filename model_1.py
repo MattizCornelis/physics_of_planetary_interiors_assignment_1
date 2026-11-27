@@ -149,6 +149,6 @@ def print_plot(t_layers, rho_layers, n):
 if __name__ == '__main__':
     t_layers = np.array([3228e3, 2091e3, 703e3, 30e3]) # [m]
     rho_layers = np.array([10401, 4898, 3691, 2900]) # [kg/m^3]
-    n = 1000
+    n = 10000
 
     print_plot(t_layers, rho_layers, n)
